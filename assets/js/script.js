@@ -9,3 +9,4 @@ if (searchHistory) {
         $("#search-history").append(newBtn);
     }
 }
+
