@@ -1,0 +1,29 @@
+nav {
+ opacity: 75%;
+ color: black !important;
+ background-color: black !important;
+}
+
+h3 {
+    color:white;
+    margin-top: 225px;
+    font-style: italic;
+    font-family: cursive;
+}
+
+p {
+    color: white;
+    font-size: 18px;
+}
+
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    color: black;
+    text-align: center;
+    opacity: 75%;
+    background-color: black;
+ }
+
