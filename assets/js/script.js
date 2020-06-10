@@ -39,7 +39,6 @@ function isTextBoxEmpty(textString){
 
 
 
-
     /*-------------------------------------------
                     FUNCTIONS
     -------------------------------------------*/
@@ -81,3 +80,4 @@ function isTextBoxEmpty(textString){
         });
     }
 })
+
