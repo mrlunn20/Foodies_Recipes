@@ -10,6 +10,31 @@ $(document).ready(function(){
     -------------------------------------------*/
     //User actions
 
+// Event listenter for Click in text area for "Search Recipes"
+
+  $("#sch-button").on("click", function(event){
+  //prevent default submission
+      event.preventDefault()
+      if(isTextBoxEmpty( $("#search-input").val())){
+          //text box empty
+      }
+      else{
+          //search by ingredient 
+      }
+  
+  //calling predicate function with isTextBoxEmpty Function and we pass 
+  //the value of the text box
+
+  });
+
+function isTextBoxEmpty(textString){
+    if (textString == '') {
+        return true
+        
+    } else {
+       return false
+    }
+}
 
 
 
