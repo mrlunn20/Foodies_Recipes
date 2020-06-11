@@ -9,9 +9,10 @@
 
     <title>Foodies Recipes</title>
 
-</head>
+  </head>
 
-<body style="background: url(assets/Background-image/16202.jpg); background-size: cover;">
+<body style = "background: url(assets/images/homepage-bg.jpg); background-size: cover;">
+
     <nav>
         <div class="nav-wrapper">
             <div class="row">
@@ -21,7 +22,7 @@
                         <li><a href="#">Saved Recipes</a></li>
                         <li><a href="#">Contact Us</a></li>
                     </ul>
-                </div>
+              </div>
             </div>
         </div>
     </nav>
@@ -58,13 +59,14 @@
                 <div class="nav-wrapper">
                     <form>
                         <div class="input-field">
-                            <input id="search" type="search" required>
-                            <label class="label-icon" for="search"><i class="material-icons"></i></label>
-                            <i class="material-icons"><a class="waves-effect waves-light btn">Search</a></i>
+                            <input id="search-input" type="search" required>
+                            <!-- <label class="label-icon" for="search"><i class="material-icons"></i></label> -->
+                            <i class="material-icons"><a class="waves-effect waves-light btn" id="rcpsearch-btn">Search</a></i>
                         </div>
                     </form>
                 </div>
             </nav>
+          </div>
         </div>
 
 
@@ -85,7 +87,22 @@
         <a href='https://www.freepik.com/free-photos-vectors/food'>Food photo created by rawpixel.com -
             www.freepik.com</a>
     </footer>
-
+    <!-- Jquery -->
+    <script
+    src="https://code.jquery.com/jquery-3.5.1.js"
+    integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+    crossorigin="anonymous"
+    ></script>
+    <!-- popper -->
+    <script
+    src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"
+    ></script>
+    <!-- Maps and Places API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVX9Ng1JM5tG1JytMgYtClu7JD6PYvP_E&libraries=places"></script>
+    <!-- custom JS -->
+    <script src="assets/js/script.js" type="text/javascript"></script>
 </body>
 
 </html>

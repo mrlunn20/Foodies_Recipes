@@ -25,30 +25,66 @@ $(document).ready(function(){
 
 // Event listenter for Click in text area for "Search Recipes"
 
-    $("#sch-button").on("click", function(event){
-    //prevent default submission
-        event.preventDefault()
-        if(isTextBoxEmpty( $("#search-input").val())){
+    $("#rcpsearch-btn").on("click", function(event){
+        // event.preventDefault();
+        let strRcpEndPoint;
+        if(isTextBoxEmpty($("#search-input").val())){
             //text box empty
+           strRcpEndPoint = fnRcpEndPointAssembly();
         }
         else{
-            //search by ingredient 
+            //search by ingredient -- i.e apples,flour,sugar ---   apples,flour ,Sugar  
+            strRcpEndPoint = fnRcpEndPointAssembly($("#search-input").val());
         }
+        console.log("endpoint: ", strRcpEndPoint);
+        //call function to query rcp API
+        fnQueryRcpAPI(strRcpEndPoint);
     });
 
-    function isTextBoxEmpty(textString){
-        if (textString == '') {
-            return true
-            
-        } else {
-        return false
-        }
-    }
 
 
     /*-------------------------------------------
                     FUNCTIONS
     -------------------------------------------*/
+    //predicate function -> text input empty
+    function isTextBoxEmpty(textString){
+        if (textString == '') {
+            return true
+        } else { 
+            return false
+        }
+    }
+
+    //food API endpoint assembly
+    function fnRcpEndPointAssembly(strIngredientList){
+        let endPointURL;
+        //optional argument (ingredient list)
+        //if list is passed, replace commas with comma URL encoding '%252C'
+        strIngredientList = strIngredientList || null;
+        if (!strIngredientList) {
+           //endPointURL = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=5";
+           //TODO: remove line below before release 
+           endPointURL = srchRandomEP;
+        }
+        else{
+            //using ingredient list
+            strIngredientList = strIngredientList.trim().toLowerCase(); //trimming and lower case change
+            strIngredientList = strIngredientList.replace(/\s/g, ""); //replacing any inner space in the string
+            strIngredientList = strIngredientList.replace(/,/g, "%252C"); //replacing comma with comma encoding for URL
+            // endPointURL = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?number=5&ranking=1&ignorePantry=false&ingredients=" + strIngredientList;
+            endPointURL = srchByIngrdEP;
+        }
+        //return end point URL
+        return endPointURL
+    }
+
+    // function fnStrSplitByComma(strList){
+    //     //verifying string not empty
+    //     if (strList) {
+    //         return strList.split(",");
+    //     }
+    // }
+
     //TODO: Un-comment function below when releasing project.
     // function fnQueryRcpAPI(strEndPoint){
     //     //apiSettings get passed into ajax call
@@ -88,7 +124,7 @@ $(document).ready(function(){
     }
 
 
-    function fnGeolocationUser(mapCtnerId){
+    function fnGeolocationUser(mapCtnerId, rcpName){
         if (!usrGeoFlag) {
             //either browser doesn't support geolocation or usr blocked permissions.
             //HTML5 geolocation
@@ -103,24 +139,24 @@ $(document).ready(function(){
                 usrGeoFlag = true; 
                 console.log("geo approved ", usrGeoFlag);
                 console.log("usr coords ", pos);
-                fnMapsRender(usrGeoFlag, true, mapCtnerId);
+                fnMapsRender(usrGeoFlag, true, mapCtnerId, rcpName);
             }, () => {
                 // Browser supports geolocation, but user has denied permission
-                fnMapsRender(usrGeoFlag, true, mapCtnerId);
+                fnMapsRender(usrGeoFlag, true, mapCtnerId, rcpName);
                 });
             } else {
                 // Browser doesn't support geolocation
-                fnMapsRender(usrGeoFlag, false, mapCtnerId);
+                fnMapsRender(usrGeoFlag, false, mapCtnerId, rcpName);
             }
         }
         else {
             //usr has already granted geolocation permissions.
-            fnMapsRender(usrGeoFlag, true, mapCtnerId);
+            fnMapsRender(usrGeoFlag, true, mapCtnerId, rcpName);
         }        
     }
 
     // Handle a geolocation error
-    function fnMapsRender(geoFlag, browserHasGeolocation, mapCtnerElementId) {
+    function fnMapsRender(geoFlag, browserHasGeolocation, mapCtnerElementId, rcpName) {
         //clearing content on element
         $("#" + mapCtnerElementId).empty();
         // Initialize variables
@@ -134,11 +170,11 @@ $(document).ready(function(){
                     center: pos,
                     zoom: 15
                 });
-            bounds.extend(pos);
-            infoWindow.setPosition(pos);
-            infoWindow.setContent("You are here.");
-            infoWindow.open(map);
-            map.setCenter(pos);
+            bounds.extend(pos); //define the geographical rectangle with pos as center reference.
+            infoWindow.setPosition(pos); //defining location on the Map where the info window will be located
+            infoWindow.setContent("You are here."); //defining content of info Window
+            infoWindow.open(map); //loading info window on map element
+            map.setCenter(pos); //defining center view of map on user's location
         }
         else {
             //geolocation issues
@@ -160,8 +196,64 @@ $(document).ready(function(){
             currentInfoWindow = infoWindow;
         }
 
-        // // Call Places Nearby Search on either usr's location or default
-        // getNearbyPlaces(pos);
+        // Call Places Nearby Search on either usr's location or default
+        getNearbyPlaces(pos, rcpName);
+    }
+
+    // Run a Nearby Places Search - Places where recipe could be served
+    function getNearbyPlaces(position, rcpName) {
+        //request object to be passed into service request method
+        let request = {
+            location: position,
+            rankBy: google.maps.places.RankBy.DISTANCE,
+            keyword: rcpName
+        };
+    
+        service = new google.maps.places.PlacesService(map); // applying to map object to be displayed
+        service.nearbySearch(request, nearbyCallback); //gets results -> create markers
+    }
+
+        // Handle the results (up to 20) of the Nearby Search
+    function nearbyCallback(srvResults, srvStatus) {
+        if (srvStatus == google.maps.places.PlacesServiceStatus.OK) {
+            //verifying service executed correctly -> call create markers if results were found
+            createMarkers(srvResults);
+        }
+        else if (srvStatus == "ZERO_RESULTS"){
+            //displaying nearby restaurants if no results were found for the recipe
+            getNearbyPlaces(pos, "restaurant");
+        }
+    }
+
+    // Set markers at the location of each place result
+    function createMarkers(places) {
+        places.forEach(place => {
+            let marker = new google.maps.Marker({
+            position: place.geometry.location,
+            map: map,
+            title: place.name
+            });
+    
+            // click listener to each marker
+            google.maps.event.addListener(marker, 'click', () => {
+                let request = {
+                    placeId: place.place_id,
+                    fields: ['name', 'formatted_address', 'geometry', 'rating',
+                    'website', 'photos']
+                };
+    
+                /* places details only queried on demand to avoid hitting API rate limits*/
+                service.getDetails(request, (placeResult, status) => {
+                    showDetails(placeResult, marker, status)
+                });
+            });
+    
+            // Adjust the map bounds to include the location of this marker
+            bounds.extend(place.geometry.location);
+        });
+        /* Once all the markers have been placed, adjust the bounds of the map to
+        * show all the markers within the visible area. */
+        map.fitBounds(bounds);
     }
 })
 
