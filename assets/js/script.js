@@ -27,7 +27,7 @@ $(document).ready(function(){
 
     $("#sch-button").on("click", function(event){
     //prevent default submission
-        event.preventDefault()
+        event.preventDefault();
         if(isTextBoxEmpty( $("#search-input").val())){
             //text box empty
         }
@@ -88,7 +88,7 @@ $(document).ready(function(){
     }
 
 
-    function fnGeolocationUser(mapCtnerId){
+    function fnGeolocationUser(mapCtnerId, rcpName){
         if (!usrGeoFlag) {
             //either browser doesn't support geolocation or usr blocked permissions.
             //HTML5 geolocation
@@ -103,24 +103,24 @@ $(document).ready(function(){
                 usrGeoFlag = true; 
                 console.log("geo approved ", usrGeoFlag);
                 console.log("usr coords ", pos);
-                fnMapsRender(usrGeoFlag, true, mapCtnerId);
+                fnMapsRender(usrGeoFlag, true, mapCtnerId, rcpName);
             }, () => {
                 // Browser supports geolocation, but user has denied permission
-                fnMapsRender(usrGeoFlag, true, mapCtnerId);
+                fnMapsRender(usrGeoFlag, true, mapCtnerId, rcpName);
                 });
             } else {
                 // Browser doesn't support geolocation
-                fnMapsRender(usrGeoFlag, false, mapCtnerId);
+                fnMapsRender(usrGeoFlag, false, mapCtnerId, rcpName);
             }
         }
         else {
             //usr has already granted geolocation permissions.
-            fnMapsRender(usrGeoFlag, true, mapCtnerId);
+            fnMapsRender(usrGeoFlag, true, mapCtnerId, rcpName);
         }        
     }
 
     // Handle a geolocation error
-    function fnMapsRender(geoFlag, browserHasGeolocation, mapCtnerElementId) {
+    function fnMapsRender(geoFlag, browserHasGeolocation, mapCtnerElementId, rcpName) {
         //clearing content on element
         $("#" + mapCtnerElementId).empty();
         // Initialize variables
@@ -134,11 +134,11 @@ $(document).ready(function(){
                     center: pos,
                     zoom: 15
                 });
-            bounds.extend(pos);
-            infoWindow.setPosition(pos);
-            infoWindow.setContent("You are here.");
-            infoWindow.open(map);
-            map.setCenter(pos);
+            bounds.extend(pos); //define the geographical rectangle with pos as center reference.
+            infoWindow.setPosition(pos); //defining location on the Map where the info window will be located
+            infoWindow.setContent("You are here."); //defining content of info Window
+            infoWindow.open(map); //loading info window on map element
+            map.setCenter(pos); //defining center view of map on user's location
         }
         else {
             //geolocation issues
@@ -160,8 +160,64 @@ $(document).ready(function(){
             currentInfoWindow = infoWindow;
         }
 
-        // // Call Places Nearby Search on either usr's location or default
-        // getNearbyPlaces(pos);
+        // Call Places Nearby Search on either usr's location or default
+        getNearbyPlaces(pos, rcpName);
+    }
+
+    // Run a Nearby Places Search - Places where recipe could be served
+    function getNearbyPlaces(position, rcpName) {
+        //request object to be passed into service request method
+        let request = {
+            location: position,
+            rankBy: google.maps.places.RankBy.DISTANCE,
+            keyword: rcpName
+        };
+    
+        service = new google.maps.places.PlacesService(map); // applying to map object to be displayed
+        service.nearbySearch(request, nearbyCallback); //gets results -> create markers
+    }
+
+        // Handle the results (up to 20) of the Nearby Search
+    function nearbyCallback(srvResults, srvStatus) {
+        if (srvStatus == google.maps.places.PlacesServiceStatus.OK) {
+            //verifying service executed correctly -> call create markers if results were found
+            createMarkers(srvResults);
+        }
+        else if (srvStatus == "ZERO_RESULTS"){
+            //displaying nearby restaurants if no results were found for the recipe
+            getNearbyPlaces(pos, "restaurant");
+        }
+    }
+
+    // Set markers at the location of each place result
+    function createMarkers(places) {
+        places.forEach(place => {
+            let marker = new google.maps.Marker({
+            position: place.geometry.location,
+            map: map,
+            title: place.name
+            });
+    
+            // click listener to each marker
+            google.maps.event.addListener(marker, 'click', () => {
+                let request = {
+                    placeId: place.place_id,
+                    fields: ['name', 'formatted_address', 'geometry', 'rating',
+                    'website', 'photos']
+                };
+    
+                /* places details only queried on demand to avoid hitting API rate limits*/
+                service.getDetails(request, (placeResult, status) => {
+                    showDetails(placeResult, marker, status)
+                });
+            });
+    
+            // Adjust the map bounds to include the location of this marker
+            bounds.extend(place.geometry.location);
+        });
+        /* Once all the markers have been placed, adjust the bounds of the map to
+        * show all the markers within the visible area. */
+        map.fitBounds(bounds);
     }
 })
 
