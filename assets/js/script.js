@@ -46,7 +46,6 @@ $(document).ready(function(){
     }
 
 
-
     /*-------------------------------------------
                     FUNCTIONS
     -------------------------------------------*/
@@ -165,3 +164,4 @@ $(document).ready(function(){
         // getNearbyPlaces(pos);
     }
 })
+
