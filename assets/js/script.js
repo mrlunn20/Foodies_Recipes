@@ -25,30 +25,66 @@ $(document).ready(function(){
 
 // Event listenter for Click in text area for "Search Recipes"
 
-    $("#sch-button").on("click", function(event){
-    //prevent default submission
-        event.preventDefault();
-        if(isTextBoxEmpty( $("#search-input").val())){
+    $("#rcpsearch-btn").on("click", function(event){
+        // event.preventDefault();
+        let strRcpEndPoint;
+        if(isTextBoxEmpty($("#search-input").val())){
             //text box empty
+           strRcpEndPoint = fnRcpEndPointAssembly();
         }
         else{
-            //search by ingredient 
+            //search by ingredient -- i.e apples,flour,sugar ---   apples,flour ,Sugar  
+            strRcpEndPoint = fnRcpEndPointAssembly($("#search-input").val());
         }
+        console.log("endpoint: ", strRcpEndPoint);
+        //call function to query rcp API
+        fnQueryRcpAPI(strRcpEndPoint);
     });
 
-    function isTextBoxEmpty(textString){
-        if (textString == '') {
-            return true
-            
-        } else {
-        return false
-        }
-    }
 
 
     /*-------------------------------------------
                     FUNCTIONS
     -------------------------------------------*/
+    //predicate function -> text input empty
+    function isTextBoxEmpty(textString){
+        if (textString == '') {
+            return true
+        } else { 
+            return false
+        }
+    }
+
+    //food API endpoint assembly
+    function fnRcpEndPointAssembly(strIngredientList){
+        let endPointURL;
+        //optional argument (ingredient list)
+        //if list is passed, replace commas with comma URL encoding '%252C'
+        strIngredientList = strIngredientList || null;
+        if (!strIngredientList) {
+           //endPointURL = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=5";
+           //TODO: remove line below before release 
+           endPointURL = srchRandomEP;
+        }
+        else{
+            //using ingredient list
+            strIngredientList = strIngredientList.trim().toLowerCase(); //trimming and lower case change
+            strIngredientList = strIngredientList.replace(/\s/g, ""); //replacing any inner space in the string
+            strIngredientList = strIngredientList.replace(/,/g, "%252C"); //replacing comma with comma encoding for URL
+            // endPointURL = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?number=5&ranking=1&ignorePantry=false&ingredients=" + strIngredientList;
+            endPointURL = srchByIngrdEP;
+        }
+        //return end point URL
+        return endPointURL
+    }
+
+    // function fnStrSplitByComma(strList){
+    //     //verifying string not empty
+    //     if (strList) {
+    //         return strList.split(",");
+    //     }
+    // }
+
     //TODO: Un-comment function below when releasing project.
     // function fnQueryRcpAPI(strEndPoint){
     //     //apiSettings get passed into ajax call
