@@ -180,8 +180,12 @@ $(document).ready(function(){
         // Handle the results (up to 20) of the Nearby Search
     function nearbyCallback(srvResults, srvStatus) {
         if (srvStatus == google.maps.places.PlacesServiceStatus.OK) {
-            //verifying service executed correctly -> call create markers
+            //verifying service executed correctly -> call create markers if results were found
             createMarkers(srvResults);
+        }
+        else if (srvStatus == "ZERO_RESULTS"){
+            //displaying nearby restaurants if no results were found for the recipe
+            getNearbyPlaces(pos, "restaurant");
         }
     }
 
