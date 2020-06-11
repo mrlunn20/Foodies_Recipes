@@ -27,3 +27,9 @@ footer {
     background-color: black;
  }
 
+body {
+    /* background-image: url('assets/Background-image/16202.jpg') !important; */
+    /* background-size: 100% !important; */
+    background-repeat: repeat !important;
+    background-position: center !important;
+  }
