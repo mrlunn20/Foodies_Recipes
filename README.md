@@ -41,9 +41,10 @@ Pin it and keep it! So you can make your favorite recipes whenever you want!
 
 ## RESOURCES
 
-![Home_Page](./assets/images/Home_Page.png)
-![Home_Page](./assets/images/Maps_Location_Veiw.png)
-![Home_Page](./assets/images/Recipe_Results_Veiw.png)
+
+![Home_Page](./assets/images/Home_Page.png) 
+![Maps_Location_Veiw](./assets/images/Maps_Location_Veiw.png)
+![Recipe_Results_Veiw](./assets/images/Recipe_Results_Veiw.png)
 
 We are using (Draw.io) to construct our wireframe (CSS: Materialize) for styling, API's: (Google Maps, and Nutrition by Spoontacular.)
 
