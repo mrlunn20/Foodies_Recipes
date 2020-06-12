@@ -50,4 +50,11 @@ footer {
 }
 
 
- 
+/* Makes contact form input fields white (easier to read) */
+.input-field label {
+    color: white;
+    }
+   .input-field input:focus + label
+   {
+    color: white;
+   }
