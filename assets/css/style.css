@@ -49,5 +49,8 @@ footer {
     background-color: black;
 }
 
-
- 
+.sch-form {width: 100%;}
+.sch-form input {border-bottom: none !important; background-color: black !important; opacity: 50%; height: 52px !important; color:white; text-align: center;}
+.sch-form input:focus, .sch-form input:active {background-color: white !important; color: black !important;}
+.sch-ctner {height: 250px;}
+.cnt-padding {padding: 200px 0;}
