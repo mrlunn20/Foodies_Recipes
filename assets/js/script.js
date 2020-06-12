@@ -17,6 +17,7 @@ $(document).ready(function(){
     let service;
     let infoPane;
     let usrGeoFlag = false; //indicates state of geolocation permissions by user. 
+    let schRandomFlag = false;
 
      /*-------------------------------------------
                     MAIN
@@ -31,14 +32,15 @@ $(document).ready(function(){
         if(isTextBoxEmpty($("#search-input").val())){
             //text box empty
            strRcpEndPoint = fnRcpEndPointAssembly();
+           schRandomFlag = true;
         }
         else{
             //search by ingredient -- i.e apples,flour,sugar ---   apples,flour ,Sugar  
             strRcpEndPoint = fnRcpEndPointAssembly($("#search-input").val());
+            schRandomFlag = false;
         }
-        console.log("endpoint: ", strRcpEndPoint);
         //call function to query rcp API
-        fnQueryRcpAPI(strRcpEndPoint);
+        fnQueryRcpAPI(strRcpEndPoint, schRandomFlag);
     });
 
 
@@ -78,7 +80,7 @@ $(document).ready(function(){
         return endPointURL
     }
 
-    // function fnStrSplitByComma(strList){
+    // function fnStrSplitByComma(strList, isRandomSch){
     //     //verifying string not empty
     //     if (strList) {
     //         return strList.split(",");
@@ -108,7 +110,7 @@ $(document).ready(function(){
 
     //Temp function for development only
     //TODO: Delete function below when releasing project. Only used for development stage
-    function fnQueryRcpAPI(strEndPoint){
+    function fnQueryRcpAPI(strEndPoint, isRandomSch){
         //apiSettings get passed into ajax call
         let apiSettings = {
             "async": true,
@@ -117,10 +119,68 @@ $(document).ready(function(){
         }
 
         //querying endpoint at rapid API
-        $.ajax(apiSettings).then(function (response) {
-            console.log(response);
-            //TODO: call next step function to extract recipe names and query google's API
+        $.ajax(apiSettings).then(function(response) {
+            if (isRandomSch) {
+                //call DOMAssembly function and pass reponse obj
+                fnRcpListDOMAssembly(response);
+            } else {
+                //search by ingred extension
+                //TODO: uncomment line below for release
+                //fnExtendSchByIngredients(response);
+                //TODO: remove line below for release
+                fnRcpListDOMAssembly(response);
+            }
+            console.log("fnQueryRcpAPI ajax end here");
         });
+    }
+
+    function fnExtendSchByIngredients(rcpObjArr){
+        let rcpInfoObj = {};
+        let rcpIDString = "";
+        let apiBulkQueryURL = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk?ids=";
+        //api settings here
+        let apiBulkSettings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "",
+            "method": "GET",
+            "headers": {
+                "x-rapidapi-host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+                "x-rapidapi-key": "f2143b91dcmsh2ab34738e9c4db3p18fd8ajsne4052a78d8a5"
+            }
+        };
+        //----
+        //extract the recipe ids for bulk query
+        rcpObjArr.forEach((element,index) => {
+            rcpIDString += element.id
+            if (!(index === rcpObjArr.length - 1)) {
+                rcpIDString += ",";
+            }
+        });
+        //updating apiBulkSettings with url
+        apiBulkSettings["url"] = apiBulkQueryURL + rcpIDString;
+        //TODO: delete below line for releasing
+        ////apiBulkSettings["url"] = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk?ids=65597";
+
+        //second ajax call to rcp API to extract additional information
+        $.ajax(apiBulkSettings).then(function(responseBulk){
+            if (responseBulk) {
+                //ensuring no empty array is pushed to previous object
+                rcpInfoObj["recipes"] = responseBulk;
+                //pushing bulk object into schByIng object
+                rcpObjArr.push(rcpInfoObj);
+                //console.log("search by Ing updated ", rcpObjArr);
+
+                //call DOM Assembly function below
+                fnRcpListDOMAssembly(rcpObjArr);
+            }
+        });
+    }
+
+
+
+    function fnRcpListDOMAssembly(rcpData){
+        //
     }
 
 

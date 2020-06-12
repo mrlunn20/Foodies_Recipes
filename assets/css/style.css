@@ -57,5 +57,5 @@ footer {
 .pnl-border {border: 1px solid gray; border-radius: 5px;}
 .ic-save-rcp, .ic-title-rcp {display: inline-flex; vertical-align: top;}
 .ic-save-rcp {font-size: 22px;}
-.ic-title-rcp {font-size: 40px; margin: 0 15px;}
+.ic-title-rcp {font-size: 40px; margin: 0 15px 0 0;}
 .card-content:hover {cursor: pointer;}
