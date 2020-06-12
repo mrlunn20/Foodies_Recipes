@@ -122,7 +122,7 @@ $(document).ready(function(){
         $.ajax(apiSettings).then(function(response) {
             if (isRandomSch) {
                 //call DOMAssembly function and pass reponse obj
-                fnRcpListDOMAssembly(response);
+                fnRcpListDOMAssembly(response, isRandomSch);
             } else {
                 //search by ingred extension
                 //TODO: uncomment line below for release
@@ -172,15 +172,86 @@ $(document).ready(function(){
                 //console.log("search by Ing updated ", rcpObjArr);
 
                 //call DOM Assembly function below
-                fnRcpListDOMAssembly(rcpObjArr);
+                fnRcpListDOMAssembly(rcpObjArr, false);
             }
         });
     }
 
 
 
-    function fnRcpListDOMAssembly(rcpData){
-        //
+    function fnRcpListDOMAssembly(rcpData, randomSDOM){
+        //recipe result list creation
+        //initiate -> remove nay previous result
+        $("#rcp-list-ul").empty();
+        //extract obj with recipe information
+        let objRecipes;
+        if (randomSDOM) {
+            objRecipes = rcpData.recipes;
+            console.log("random");
+        }
+        else {
+            objRecipes = rcpData[rcpData.length - 1].recipes;
+            console.log("ingredients");
+        }
+        console.log(objRecipes);
+        objRecipes.forEach((element,index) => {
+            fnCreateRcpCardElement(element);
+        });
+    }
+
+    function fnCreateRcpCardElement(rcpInfo){
+        let ilCard = $("<li>");
+        ilCard.attr({"class": "rcp_title_card"});
+        //card content
+        let cardDiv = $("<div>");
+        cardDiv.attr({"class": "card horizontal hoverable"});
+        //card stacked div
+        let cardstDiv = $("<div>");
+        cardstDiv.attr({"class": "card-stacked"});
+        //card content div
+        let cardCntDiv = $("<div>");
+        cardCntDiv.attr({"class": "card-content"});
+        //title
+        let titleSpan = $("<span>");
+        titleSpan.attr({"class": "card-title grey-text text-darken-4"});
+        titleSpan.text(rcpInfo.title);
+        //icon
+        let titleIcon = $("<i>");
+        titleIcon.attr({"class": "material-icons ic-title-rcp"});
+        titleIcon.text("restaurant_menu");
+        //action section in card
+        let cardAction = $("<div>");
+        cardAction.attr({"class": "card-action"});
+        //save recipe link
+        let svRcpLink = $("<a>");
+        svRcpLink.text("Save Recipe");
+        //plus sing icon for svRcpLink
+        let svRcpIcon = $("<i>");
+        svRcpIcon.attr({"class": "material-icons ic-save-rcp"});
+        svRcpIcon.text("add");
+
+        //adding icon to span
+        titleSpan.prepend(titleIcon);
+        // appending span to card content
+        cardCntDiv.append(titleSpan);
+        //appending card content to card-stacked
+        cardstDiv.append(cardCntDiv);
+
+         //prepend icon to a tag
+         svRcpLink.prepend(svRcpIcon);
+         //adding link to card action div
+         cardAction.append(svRcpLink);
+        //appending card action to card-stacked
+        cardstDiv.append(cardAction);
+
+        //append card stacked to card horizontal
+        cardDiv.append(cardstDiv);
+
+        //card to il element
+        ilCard.append(cardDiv);
+
+        //append ilCard to ul element
+        $("#rcp-list-ul").append(ilCard);
     }
 
 
