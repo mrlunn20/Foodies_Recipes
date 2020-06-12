@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
 
     <title>Foodies Recipes</title>
@@ -53,12 +54,12 @@
     <div class="container cnt-padding">
         <div class="center sch-ctner">
             <h3>Foodies Recipes</h3>
-            <p>Search for your favorite dishes, foods, and recipes!</p>
-            <p>look at nutriental values and build a recipe book!</p>
+            <p>Search recipes by comma-separated ingredients or click SEARCH for random recipes.</p>
+            <!-- <p>look at nutriental values and build a recipe book!</p> -->
             <div class="form-wrapper">
                 <form class="sch-form">
                     <div class="input-field">
-                        <input id="search-input" type="search" required>
+                        <input id="search-input" type="search" placeholder="What's in your fridge?" required>
                         <!-- <label class="label-icon" for="search"><i class="material-icons"></i></label> -->
                         <i class="material-icons"><a class="waves-effect waves-light btn" id="rcpsearch-btn">Search</a></i>
                     </div>
@@ -68,8 +69,47 @@
     </div>
     <div class="section white">
         <div class="row container">
-            <h2 class="header">Parallax</h2>
+            <h2 class="header">Recipes Found</h2>
             <p class="grey-text text-darken-3 lighten-3">Parallax is an effect where the background content or image in this case, is moved at a different speed than the foreground content while scrolling.</p>
+            <div class="col s12 m4 l4 pnl-border">
+                <div class="rcp_list_ctner">
+                    <ul class="rcp_list">
+                        <li class="rcp_title_card">
+                            <div class="card horizontal hoverable">
+                                <!-- <div class="card-image">
+                                <img src="https://lorempixel.com/100/190/nature/6">
+                                </div> -->
+                                <div class="card-stacked">
+                                    <div class="card-content">
+                                        <span class="card-title grey-text text-darken-4"><i class="material-icons ic-title-rcp">restaurant_menu</i>Pizza bites with pumpkin</span>
+                                        <!-- <p class="grey-text text-darken-3 lighten-3">I am a very simple card. I am good at containing small bits of information.</p> -->
+                                    </div>
+                                    <div class="card-action">
+                                        <a href="#"><i class="material-icons ic-save-rcp">add</i>Save Recipe</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="rcp_title_card">
+                            <div class="card horizontal hoverable">
+                                <!-- <div class="card-image">
+                                <img src="https://lorempixel.com/100/190/nature/6">
+                                </div> -->
+                                <div class="card-stacked">
+                                    <div class="card-content">
+                                        <span class="card-title grey-text text-darken-4"><i class="material-icons ic-title-rcp">restaurant_menu</i>Pizza bites with pumpkin</span>
+                                        <!-- <p class="grey-text text-darken-3 lighten-3">I am a very simple card. I am good at containing small bits of information.</p> -->
+                                    </div>
+                                    <div class="card-action">
+                                        <a href="#"><i class="material-icons ic-save-rcp">add</i>Save Recipe</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col s12 m8 l8 pnl-border">s12 m4</div>
         </div>
     </div>
 
