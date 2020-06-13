@@ -98,70 +98,70 @@ $(document).ready(function(){
         //if list is passed, replace commas with comma URL encoding '%252C'
         strIngredientList = strIngredientList || null;
         if (!strIngredientList) {
-           //endPointURL = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=5";
+           endPointURL = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=5";
            //TODO: remove line below before release 
-           endPointURL = srchRandomEP;
+           //endPointURL = srchRandomEP;
         }
         else{
             //using ingredient list
             strIngredientList = strIngredientList.trim().toLowerCase(); //trimming and lower case change
             strIngredientList = strIngredientList.replace(/\s/g, ""); //replacing any inner space in the string
             strIngredientList = strIngredientList.replace(/,/g, "%252C"); //replacing comma with comma encoding for URL
-            // endPointURL = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?number=5&ranking=1&ignorePantry=false&ingredients=" + strIngredientList;
-            endPointURL = srchByIngrdEP;
+            endPointURL = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?number=5&ranking=1&ignorePantry=false&ingredients=" + strIngredientList;
+            //endPointURL = srchByIngrdEP;
         }
         //return end point URL
         return endPointURL
     }
 
     //TODO: Un-comment function below when releasing project.
-    // function fnQueryRcpAPI(strEndPoint, isRandomSch){
-    //     //apiSettings get passed into ajax call
-    //     let apiSettings = {
-    //         "async": true,
-    //         "crossDomain": true,
-    //         "url": strEndPoint,
-    //         "method": "GET",
-    //         "headers": {
-    //             "x-rapidapi-host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-    //             "x-rapidapi-key": "f2143b91dcmsh2ab34738e9c4db3p18fd8ajsne4052a78d8a5"
-    //         }
-    //     }
-
-    //     //querying endpoint at rapid API
-    //     $.ajax(apiSettings).then(function (response) {
-        // if (isRandomSch) {
-        //     //call DOMAssembly function and pass reponse obj
-        //     fnRcpListDOMAssembly(response, isRandomSch);
-        // } else {
-        //     //search by ingred extension
-        //     fnExtendSchByIngredients(response);
-        // }
-    //     });
-    // }
-
-    //Temp function for development only
-    //TODO: Delete function below when releasing project. Only used for development stage
     function fnQueryRcpAPI(strEndPoint, isRandomSch){
         //apiSettings get passed into ajax call
         let apiSettings = {
             "async": true,
+            "crossDomain": true,
             "url": strEndPoint,
             "method": "GET",
+            "headers": {
+                "x-rapidapi-host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+                "x-rapidapi-key": "f2143b91dcmsh2ab34738e9c4db3p18fd8ajsne4052a78d8a5"
+            }
         }
 
         //querying endpoint at rapid API
-        $.ajax(apiSettings).then(function(response) {
-            if (isRandomSch) {
-                //call DOMAssembly function and pass reponse obj
-                fnRcpListDOMAssembly(response, isRandomSch);
-            } else {
-                //search by ingred extension
-                fnRcpListDOMAssembly(response);
-            }
-            // console.log("fnQueryRcpAPI ajax end here");
+        $.ajax(apiSettings).then(function (response) {
+        if (isRandomSch) {
+            //call DOMAssembly function and pass reponse obj
+            fnRcpListDOMAssembly(response, isRandomSch);
+        } else {
+            //search by ingred extension
+            fnExtendSchByIngredients(response);
+        }
         });
     }
+
+    //Temp function for development only
+    //TODO: Delete function below when releasing project. Only used for development stage
+    // function fnQueryRcpAPI(strEndPoint, isRandomSch){
+    //     //apiSettings get passed into ajax call
+    //     let apiSettings = {
+    //         "async": true,
+    //         "url": strEndPoint,
+    //         "method": "GET",
+    //     }
+
+    //     //querying endpoint at rapid API
+    //     $.ajax(apiSettings).then(function(response) {
+    //         if (isRandomSch) {
+    //             //call DOMAssembly function and pass reponse obj
+    //             fnRcpListDOMAssembly(response, isRandomSch);
+    //         } else {
+    //             //search by ingred extension
+    //             fnRcpListDOMAssembly(response);
+    //         }
+    //         // console.log("fnQueryRcpAPI ajax end here");
+    //     });
+    // }
 
     function fnExtendSchByIngredients(rcpObjArr){
         let rcpInfoObj = {};
