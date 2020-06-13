@@ -12,7 +12,8 @@
 
 </head>
 
-<body style="background: url(assets/images/homepage-bg.jpg); background-size: cover;">
+<!-- <body style="background: url(assets/images/homepage-bg.jpg); background-size: cover;"> -->
+<body class="bd-fixedbg">
 
     <nav>
         <div class="nav-wrapper">
@@ -32,7 +33,7 @@
     <div class="container cnt-padding">
         <div class="center sch-ctner">
             <h3>Foodies Recipes</h3>
-            <p>Search recipes by comma-separated ingredients or click SEARCH for random recipes.</p>
+            <p class="hp-inst">Search recipes by comma-separated ingredients or click SEARCH for random recipes.</p>
             <!-- <p>look at nutriental values and build a recipe book!</p> -->
             <div class="form-wrapper">
                 <form class="sch-form">
@@ -45,10 +46,10 @@
             </div>
         </div>
     </div>
-    <div class="section white">
+    <div class="section white d-hidden" id="rcp-result-section">
         <div class="row container">
-            <h2 class="header">Recipes Found</h2>
-            <p class="grey-text text-darken-3 lighten-3">Parallax is an effect where the background content or image in this case, is moved at a different speed than the foreground content while scrolling.</p>
+            <h4 class="header">Recipes Found</h4>
+            <p>Click on Recipe Cards (on the left) to display the recipe information on the right panel. Below the recipe information, an option to display Nearby Restaurants in Google Maps is available.</p>
             <div class="col s12 m4 l4 pnl-border">
                 <div class="rcp_list_ctner">
                     <ul class="rcp_list" id="rcp-list-ul">

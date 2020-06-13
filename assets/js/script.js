@@ -1,9 +1,5 @@
 $(document).ready(function(){
-
-    //TODO: remove example below for release.
     $('.collapsible').collapsible();
-
-
     //temporary variables only for development
     //TODO: delete the two variables below when releasing the project
     let srchRandomEP = "https://arielcc88.github.io/UT-FSWD-DEPLOYED/assets/srch_random.json";
@@ -21,7 +17,6 @@ $(document).ready(function(){
     let service;
     let infoPane;
     let usrGeoFlag = false; //indicates state of geolocation permissions by user. 
-
     let schRandomFlag = false;
     let gblRcpObj;
      /*-------------------------------------------
@@ -31,7 +26,7 @@ $(document).ready(function(){
     // Event listenter for Click in text area for "Search Recipes"
 
     $("#rcpsearch-btn").on("click", function(event){
-        // event.preventDefault();
+        event.preventDefault();
         let strRcpEndPoint;
         if(isTextBoxEmpty($("#search-input").val())){
             //text box empty
@@ -45,11 +40,26 @@ $(document).ready(function(){
         }
         //call function to query rcp API
         fnQueryRcpAPI(strRcpEndPoint, schRandomFlag);
+
+        //display section with results
+        fnClassHiddenRemove();
+
+        //scroll to element
+        fnScrollToElement("rcp-result-section");
     });
 
     $(document).on("click", ".card-content", (event) => {
         event.stopPropagation();
+        fnRcpActiveToggle();
         fnCreatePanelCollabInfo(event.currentTarget.getAttribute("data-eindex"));
+        event.currentTarget.classList.add("rcpcard-active");
+    });
+
+    //maps listener
+    $(document).on("click", ".mp-load", (event) => {
+        event.stopPropagation();
+        //debugger
+        fnGeolocationUser(event.currentTarget.getAttribute("data-mapctner"), event.currentTarget.getAttribute("data-rcpname"));
     });
 
     /*-------------------------------------------
@@ -62,6 +72,23 @@ $(document).ready(function(){
         } else { 
             return false
         }
+    }
+
+    //change class on result section
+    function fnClassHiddenRemove(){
+        $("#rcp-result-section").removeClass("d-hidden");
+    }
+
+    //scroll to element
+    function fnScrollToElement(elemId){
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#" + elemId).offset().top
+        }, 1000);
+    }
+
+    //changing active class for rcp cards
+    function fnRcpActiveToggle(){
+        $(".rcpcard-active").removeClass("rcpcard-active");
     }
 
     //food API endpoint assembly
@@ -87,15 +114,8 @@ $(document).ready(function(){
         return endPointURL
     }
 
-    // function fnStrSplitByComma(strList, isRandomSch){
-    //     //verifying string not empty
-    //     if (strList) {
-    //         return strList.split(",");
-    //     }
-    // }
-
     //TODO: Un-comment function below when releasing project.
-    // function fnQueryRcpAPI(strEndPoint){
+    // function fnQueryRcpAPI(strEndPoint, isRandomSch){
     //     //apiSettings get passed into ajax call
     //     let apiSettings = {
     //         "async": true,
@@ -110,8 +130,13 @@ $(document).ready(function(){
 
     //     //querying endpoint at rapid API
     //     $.ajax(apiSettings).then(function (response) {
-    //         console.log(response);
-    //         //TODO: call next step function to extract recipe names and query google's API
+        // if (isRandomSch) {
+        //     //call DOMAssembly function and pass reponse obj
+        //     fnRcpListDOMAssembly(response, isRandomSch);
+        // } else {
+        //     //search by ingred extension
+        //     fnExtendSchByIngredients(response);
+        // }
     //     });
     // }
 
@@ -132,12 +157,9 @@ $(document).ready(function(){
                 fnRcpListDOMAssembly(response, isRandomSch);
             } else {
                 //search by ingred extension
-                //TODO: uncomment line below for release
-                //fnExtendSchByIngredients(response);
-                //TODO: remove line below for release
                 fnRcpListDOMAssembly(response);
             }
-            console.log("fnQueryRcpAPI ajax end here");
+            // console.log("fnQueryRcpAPI ajax end here");
         });
     }
 
@@ -166,8 +188,6 @@ $(document).ready(function(){
         });
         //updating apiBulkSettings with url
         apiBulkSettings["url"] = apiBulkQueryURL + rcpIDString;
-        //TODO: delete below line for releasing
-        ////apiBulkSettings["url"] = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk?ids=65597";
 
         //second ajax call to rcp API to extract additional information
         $.ajax(apiBulkSettings).then(function(responseBulk){
@@ -194,13 +214,13 @@ $(document).ready(function(){
         let objRecipes;
         if (randomSDOM) {
             objRecipes = rcpData.recipes;
-            console.log("random");
+            // console.log("random");
         }
         else {
             objRecipes = rcpData[rcpData.length - 1].recipes;
-            console.log("ingredients");
+            // console.log("ingredients");
         }
-        console.log(objRecipes);
+        // console.log(objRecipes);
         gblRcpObj = objRecipes;
         objRecipes.forEach((element,index) => {
             fnCreateRcpCardElement(element, index);
@@ -228,9 +248,9 @@ $(document).ready(function(){
         titleSpan.attr({"class": "card-title grey-text text-darken-4"});
         titleSpan.text(rcpInfo.title);
         //icon
-        let titleIcon = $("<i>");
-        titleIcon.attr({"class": "material-icons ic-title-rcp"});
-        titleIcon.text("restaurant_menu");
+        // let titleIcon = $("<i>");
+        // titleIcon.attr({"class": "material-icons ic-title-rcp"});
+        // titleIcon.text("restaurant_menu");
         //action section in card
         let cardAction = $("<div>");
         cardAction.attr({"class": "card-action"});
@@ -243,7 +263,7 @@ $(document).ready(function(){
         svRcpIcon.text("add");
 
         //adding icon to span
-        titleSpan.prepend(titleIcon);
+        // titleSpan.prepend(titleIcon);
         // appending span to card content
         cardCntDiv.append(titleSpan);
         //appending card content to card-stacked
@@ -254,7 +274,7 @@ $(document).ready(function(){
          //adding link to card action div
          cardAction.append(svRcpLink);
         //appending card action to card-stacked
-        cardstDiv.append(cardAction);
+        // cardstDiv.append(cardAction);
 
         //append card stacked to card horizontal
         cardDiv.append(cardstDiv);
@@ -264,6 +284,9 @@ $(document).ready(function(){
 
         //append ilCard to ul element
         $("#rcp-list-ul").append(ilCard);
+
+         //activating first recipe card
+         $("div[data-eindex='0']").addClass("rcpcard-active");
     }
 
     function fnCreatePanelCollabInfo(rcpIndex){
@@ -296,7 +319,7 @@ $(document).ready(function(){
             "   <i class=\"material-icons\">restaurant_menu</i>" + rcpInfofromEl.title +
             "</div>" +
             "<div class=\"collapsible-body\">" +
-            "   <span>Lorem ipsum dolor sit amet.</span>" +
+            // "   <span>Lorem ipsum dolor sit amet.</span>" +
             "   <div class=\"row\">" +
             "       <div class=\"col s12 m4 l4\">" +
             "           <div class=\"rcpImgCtner\">" +
@@ -312,7 +335,7 @@ $(document).ready(function(){
             "               <li>Cook. Time(min): " + cookTime + "</li>" + 
             "           </ul>" +
             "       </div>" + 
-            "       <div class=\"col s12 m8 l8\">" +
+            "       <div class=\"col s12 m8 l8 ingrd-ctner\">" +
             "           <h5>Ingredients</h5>" + 
             "           <ul class=\"rcpFactList\">" + strIngredientsHTML + "</ul>" +
             "       </div>" +
@@ -336,12 +359,17 @@ $(document).ready(function(){
             "</div>" +
             "<div class=\"collapsible-body\">" +
             "<p class=\"mp-notifier\"></p>" +
-            "   <div class=\"mp-ctner\" id=\"mp-" + rcpInfofromEl.id + "\"> " +
-
+            "   <div class=\"row\">" +
+            "       <div class=\"col s12 m12 l12 mp-outer-ctner\">" +
+            "           <div class=\"mp-ctner\" id=\"mp-" + rcpInfofromEl.id + "\"> " +
+            "           </div>" +
+            "       </div>" +
             "   </div>" +
             "</div>"
         );
         $(".collapsible").append(liCollapsibleMaps);
+
+        infoPane = document.getElementById('panel');
     }
 
 
@@ -358,8 +386,8 @@ $(document).ready(function(){
                     lng: position.coords.longitude
                 };
                 usrGeoFlag = true; 
-                console.log("geo approved ", usrGeoFlag);
-                console.log("usr coords ", pos);
+                // console.log("geo approved ", usrGeoFlag);
+                // console.log("usr coords ", pos);
                 fnMapsRender(usrGeoFlag, true, mapCtnerId, rcpName);
             }, () => {
                 // Browser supports geolocation, but user has denied permission
@@ -476,5 +504,22 @@ $(document).ready(function(){
         * show all the markers within the visible area. */
         map.fitBounds(bounds);
     }
+
+    // Builds an InfoWindow to display details above the marker
+    function showDetails(placeResult, marker, status) {
+        if (status == google.maps.places.PlacesServiceStatus.OK) {
+          let placeInfowindow = new google.maps.InfoWindow();
+          let rating = "None";
+          if (placeResult.rating) rating = placeResult.rating;
+          placeInfowindow.setContent('<div><strong>' + placeResult.name +
+            '</strong><br>' + 'Rating: ' + rating + '<br>' + placeResult.formatted_address +
+            '</div>');
+          placeInfowindow.open(marker.map, marker);
+          currentInfoWindow.close();
+          currentInfoWindow = placeInfowindow;
+        } else {
+          console.log('showDetails failed: ' + status);
+        }
+      }
 })
 

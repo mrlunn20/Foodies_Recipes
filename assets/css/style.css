@@ -1,10 +1,17 @@
-body {
+/* body { */
     /* background-image: url('assets/Background-image/16202.jpg') !important; */
     /* background-size: 100% !important; */
-    background-repeat: repeat !important;
+    /* background-repeat: repeat !important;
     background-position: center !important;
-  }
+  } */
 
+.bd-fixedbg {
+background-image: url("../images/homepage-bg.jpg");
+background-attachment: fixed;
+background-position: center;
+background-repeat: no-repeat;
+background-size: cover;
+}
 
 
 nav {
@@ -19,19 +26,21 @@ h3 {
     font-style: italic;
     font-family: cursive;
 }
+.hp-inst {color: white; font-size: 22px;}
+.d-hidden {display: none;}
 
-h2 {
+/* h2 {
     font-size: small;
     color:white;
     margin-top: 25px;
-}
+} */
 
-p {
+/* p {
     color: black;
     font-size: 20px;
-}
+} */
 
-#recipes,
+/* #recipes,
 #savedRecipes,
 #gmSearch {
     min-height: 350px;
@@ -42,7 +51,7 @@ p {
     padding: 15px;
     color: white;
     font-size: 20px;
-}
+} */
 
 footer {
     position: fixed;
@@ -58,20 +67,26 @@ footer {
 .sch-form {width: 100%;}
 .sch-form input {border-bottom: none !important; background-color: black !important; opacity: 50%; height: 60px !important; color:white; text-align: center; font-size: 20px !important;}
 .sch-form input:focus, .sch-form input:active {background-color: white !important; color: black !important;}
-.sch-ctner {height: 250px;}
-.cnt-padding {padding: 200px 0;}
-.pnl-border {border: 1px solid gray; border-radius: 5px;}
+.sch-ctner {height: 250px; padding-top: 60px;}
+.cnt-padding {padding: 150px 0;}
+.pnl-border {border: 1px solid gray; border-radius: 5px; height: 600px; max-height: 600px; overflow-y: auto;}
 .ic-save-rcp, .ic-title-rcp {display: inline-flex; vertical-align: top;}
 .ic-save-rcp {font-size: 22px;}
 .ic-title-rcp {font-size: 40px; margin: 0 15px 0 0;}
 .card-content:hover {cursor: pointer;}
 .rcpImg{ width: 100%}
-
+.card .card-title {
+    font-size: 16px !important;
+}
+.rcpcard-active {background-color: #26a69a;}
+.ingrd-ctner {padding: 0 30px;}
+.mp-outer-ctner {height: 500px;}
+.mp-ctner {height: 100%;}
 /* Makes contact form input fields white (easier to read) */
-h2, .input-field label {
-    color: white;
-    }
-   .input-field input:focus + label
-   {
-    color: white;
-   }
+.input-field label, .ctform-head {
+color: white;
+}
+.input-field input:focus + label
+{
+color: white;
+}
