@@ -20,8 +20,14 @@ h3 {
     font-family: cursive;
 }
 
+h2 {
+    font-size: small;
+    color:white;
+    margin-top: 25px;
+}
+
 p {
-    color: white;
+    color: black;
     font-size: 20px;
 }
 
@@ -60,3 +66,12 @@ footer {
 .ic-title-rcp {font-size: 40px; margin: 0 15px 0 0;}
 .card-content:hover {cursor: pointer;}
 .rcpImg{ width: 100%}
+
+/* Makes contact form input fields white (easier to read) */
+h2, .input-field label {
+    color: white;
+    }
+   .input-field input:focus + label
+   {
+    color: white;
+   }
