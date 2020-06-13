@@ -1,5 +1,9 @@
 $(document).ready(function(){
 
+    //TODO: remove example below for release.
+    $('.collapsible').collapsible();
+
+
     //temporary variables only for development
     //TODO: delete the two variables below when releasing the project
     let srchRandomEP = "https://arielcc88.github.io/UT-FSWD-DEPLOYED/assets/srch_random.json";
@@ -17,14 +21,14 @@ $(document).ready(function(){
     let service;
     let infoPane;
     let usrGeoFlag = false; //indicates state of geolocation permissions by user. 
-    let schRandomFlag = false;
 
+    let schRandomFlag = false;
+    let gblRcpObj;
      /*-------------------------------------------
                     MAIN
     -------------------------------------------*/
     //User actions
-
-// Event listenter for Click in text area for "Search Recipes"
+    // Event listenter for Click in text area for "Search Recipes"
 
     $("#rcpsearch-btn").on("click", function(event){
         // event.preventDefault();
@@ -43,7 +47,10 @@ $(document).ready(function(){
         fnQueryRcpAPI(strRcpEndPoint, schRandomFlag);
     });
 
-
+    $(document).on("click", ".card-content", (event) => {
+        event.stopPropagation();
+        fnCreatePanelCollabInfo(event.currentTarget.getAttribute("data-eindex"));
+    });
 
     /*-------------------------------------------
                     FUNCTIONS
@@ -194,12 +201,14 @@ $(document).ready(function(){
             console.log("ingredients");
         }
         console.log(objRecipes);
+        gblRcpObj = objRecipes;
         objRecipes.forEach((element,index) => {
-            fnCreateRcpCardElement(element);
+            fnCreateRcpCardElement(element, index);
         });
+        fnCreatePanelCollabInfo(0);
     }
 
-    function fnCreateRcpCardElement(rcpInfo){
+    function fnCreateRcpCardElement(rcpInfo, elNumInd){
         let ilCard = $("<li>");
         ilCard.attr({"class": "rcp_title_card"});
         //card content
@@ -210,7 +219,10 @@ $(document).ready(function(){
         cardstDiv.attr({"class": "card-stacked"});
         //card content div
         let cardCntDiv = $("<div>");
-        cardCntDiv.attr({"class": "card-content"});
+        cardCntDiv.attr({
+            "class": "card-content",
+            "data-eIndex": elNumInd
+        });
         //title
         let titleSpan = $("<span>");
         titleSpan.attr({"class": "card-title grey-text text-darken-4"});
@@ -252,6 +264,84 @@ $(document).ready(function(){
 
         //append ilCard to ul element
         $("#rcp-list-ul").append(ilCard);
+    }
+
+    function fnCreatePanelCollabInfo(rcpIndex){
+        let rcpInfofromEl = gblRcpObj[rcpIndex];
+        let vegetarian = rcpInfofromEl.vegetarian ? "Yes" : "No";
+        let vegan = rcpInfofromEl.vegan ? "Yes" : "No";
+        let dairy = rcpInfofromEl.dairyFree ? "Yes" : "No";
+        let gluten = rcpInfofromEl.glutenFree ? "Yes" : "No";
+        let servings = rcpInfofromEl.servings ? rcpInfofromEl.servings : "";
+        let prepTime = rcpInfofromEl.preparationMinutes ? rcpInfofromEl.preparationMinutes : "";
+        let cookTime = rcpInfofromEl.cookingMinutes ? rcpInfofromEl.cookingMinutes : "";
+
+        //getting ingredients
+        let extendedIngrd = rcpInfofromEl.extendedIngredients;
+        let strIngredientsHTML = "";
+
+        extendedIngrd.forEach((ingrdInfo, ingIndex) => {
+            strIngredientsHTML += "<li>" + ingrdInfo.originalString + "</li>";
+        });
+
+        //collapsible ul
+        // let ulCollapsible = $("<ul>");
+        // ulCollapsible.attr({"class": "collapsible"});
+        $(".collapsible").empty();
+        let liCollapsibleRcp = $("<li>");
+        let liCollapsibleMaps = $("<li>");
+        
+        liCollapsibleRcp.html(
+            "<div class=\"collapsible-header\"> " + 
+            "   <i class=\"material-icons\">restaurant_menu</i>" + rcpInfofromEl.title +
+            "</div>" +
+            "<div class=\"collapsible-body\">" +
+            "   <span>Lorem ipsum dolor sit amet.</span>" +
+            "   <div class=\"row\">" +
+            "       <div class=\"col s12 m4 l4\">" +
+            "           <div class=\"rcpImgCtner\">" +
+            "               <img src=\"" + rcpInfofromEl.image + "\" alt=\"" + rcpInfofromEl.title + "\" class=\"rcpImg\">" +
+            "           </div>" + 
+            "           <ul class=\"rcpFactList\">" + 
+            "               <li>Vegetarian: " + vegetarian + "</li>" + 
+            "               <li>Vegan: " + vegan + "</li>" + 
+            "               <li>Gluten Free: " + gluten + "</li>" + 
+            "               <li>Dairy Free: " + dairy + "</li>" + 
+            "               <li>Servings: " + servings + "</li>" + 
+            "               <li>Prep. Time(min): " + prepTime + "</li>" + 
+            "               <li>Cook. Time(min): " + cookTime + "</li>" + 
+            "           </ul>" +
+            "       </div>" + 
+            "       <div class=\"col s12 m8 l8\">" +
+            "           <h5>Ingredients</h5>" + 
+            "           <ul class=\"rcpFactList\">" + strIngredientsHTML + "</ul>" +
+            "       </div>" +
+            "       <div class=\"col s12\">" + 
+            "           <h5>Summary</h5>" +
+            "           <p>" + rcpInfofromEl.summary + "</p>" +
+            "       </div>"+
+            "       <div class=\"col s12\">" + 
+            "           <h5>Instructions</h5>" +
+            "           <p>" + rcpInfofromEl.instructions + "</p>" +
+            "       </div>"+                    
+            "   </div>" +
+            "</div>"
+        );
+        $(".collapsible").append(liCollapsibleRcp);
+
+        /** Maps */
+        liCollapsibleMaps.html(
+            "<div class=\"collapsible-header mp-load\" data-mapctner=\"mp-" + rcpInfofromEl.id + "\" data-rcpname=\"" + rcpInfofromEl.title +"\"> " + 
+            "   <i class=\"material-icons\">place</i>Show Nearby Restaurants" +
+            "</div>" +
+            "<div class=\"collapsible-body\">" +
+            "<p class=\"mp-notifier\"></p>" +
+            "   <div class=\"mp-ctner\" id=\"mp-" + rcpInfofromEl.id + "\"> " +
+
+            "   </div>" +
+            "</div>"
+        );
+        $(".collapsible").append(liCollapsibleMaps);
     }
 
 
