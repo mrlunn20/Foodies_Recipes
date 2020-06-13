@@ -1,6 +1,4 @@
 $(document).ready(function(){
-
-    //TODO: remove example below for release.
     $('.collapsible').collapsible();
 
 
@@ -31,7 +29,7 @@ $(document).ready(function(){
     // Event listenter for Click in text area for "Search Recipes"
 
     $("#rcpsearch-btn").on("click", function(event){
-        // event.preventDefault();
+        event.preventDefault();
         let strRcpEndPoint;
         if(isTextBoxEmpty($("#search-input").val())){
             //text box empty
@@ -45,11 +43,19 @@ $(document).ready(function(){
         }
         //call function to query rcp API
         fnQueryRcpAPI(strRcpEndPoint, schRandomFlag);
+
+        //display section with results
+        fnClassHiddenRemove();
+
+        //scroll to element
+        fnScrollToElement("rcp-result-section");
     });
 
     $(document).on("click", ".card-content", (event) => {
         event.stopPropagation();
+        fnRcpActiveToggle();
         fnCreatePanelCollabInfo(event.currentTarget.getAttribute("data-eindex"));
+        event.currentTarget.classList.add("rcpcard-active");
     });
 
     /*-------------------------------------------
@@ -62,6 +68,23 @@ $(document).ready(function(){
         } else { 
             return false
         }
+    }
+
+    //change class on result section
+    function fnClassHiddenRemove(){
+        $("#rcp-result-section").removeClass("d-hidden");
+    }
+
+    //scroll to element
+    function fnScrollToElement(elemId){
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#" + elemId).offset().top
+        }, 1000);
+    }
+
+    //changing active class for rcp cards
+    function fnRcpActiveToggle(){
+        $(".rcpcard-active").removeClass("rcpcard-active");
     }
 
     //food API endpoint assembly
@@ -228,9 +251,9 @@ $(document).ready(function(){
         titleSpan.attr({"class": "card-title grey-text text-darken-4"});
         titleSpan.text(rcpInfo.title);
         //icon
-        let titleIcon = $("<i>");
-        titleIcon.attr({"class": "material-icons ic-title-rcp"});
-        titleIcon.text("restaurant_menu");
+        // let titleIcon = $("<i>");
+        // titleIcon.attr({"class": "material-icons ic-title-rcp"});
+        // titleIcon.text("restaurant_menu");
         //action section in card
         let cardAction = $("<div>");
         cardAction.attr({"class": "card-action"});
@@ -243,7 +266,7 @@ $(document).ready(function(){
         svRcpIcon.text("add");
 
         //adding icon to span
-        titleSpan.prepend(titleIcon);
+        // titleSpan.prepend(titleIcon);
         // appending span to card content
         cardCntDiv.append(titleSpan);
         //appending card content to card-stacked
@@ -254,7 +277,7 @@ $(document).ready(function(){
          //adding link to card action div
          cardAction.append(svRcpLink);
         //appending card action to card-stacked
-        cardstDiv.append(cardAction);
+        // cardstDiv.append(cardAction);
 
         //append card stacked to card horizontal
         cardDiv.append(cardstDiv);
@@ -264,6 +287,9 @@ $(document).ready(function(){
 
         //append ilCard to ul element
         $("#rcp-list-ul").append(ilCard);
+
+         //activating first recipe card
+         $("div[data-eindex='0']").addClass("rcpcard-active");
     }
 
     function fnCreatePanelCollabInfo(rcpIndex){
@@ -296,7 +322,7 @@ $(document).ready(function(){
             "   <i class=\"material-icons\">restaurant_menu</i>" + rcpInfofromEl.title +
             "</div>" +
             "<div class=\"collapsible-body\">" +
-            "   <span>Lorem ipsum dolor sit amet.</span>" +
+            // "   <span>Lorem ipsum dolor sit amet.</span>" +
             "   <div class=\"row\">" +
             "       <div class=\"col s12 m4 l4\">" +
             "           <div class=\"rcpImgCtner\">" +
