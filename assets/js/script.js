@@ -58,6 +58,13 @@ $(document).ready(function(){
         event.currentTarget.classList.add("rcpcard-active");
     });
 
+    //maps listener
+    $(document).on("click", ".mp-load", (event) => {
+        event.stopPropagation();
+        //debugger
+        fnGeolocationUser(event.currentTarget.getAttribute("data-mapctner"), event.currentTarget.getAttribute("data-rcpname"));
+    });
+
     /*-------------------------------------------
                     FUNCTIONS
     -------------------------------------------*/
@@ -338,7 +345,7 @@ $(document).ready(function(){
             "               <li>Cook. Time(min): " + cookTime + "</li>" + 
             "           </ul>" +
             "       </div>" + 
-            "       <div class=\"col s12 m8 l8\">" +
+            "       <div class=\"col s12 m8 l8 ingrd-ctner\">" +
             "           <h5>Ingredients</h5>" + 
             "           <ul class=\"rcpFactList\">" + strIngredientsHTML + "</ul>" +
             "       </div>" +
@@ -362,8 +369,12 @@ $(document).ready(function(){
             "</div>" +
             "<div class=\"collapsible-body\">" +
             "<p class=\"mp-notifier\"></p>" +
-            "   <div class=\"mp-ctner\" id=\"mp-" + rcpInfofromEl.id + "\"> " +
-
+            "   <div class=\"row\">" +
+            "       <div class=\"col s12 m12 l12 mp-outer-ctner\">" +
+            "" +
+            "           <div class=\"mp-ctner\" id=\"mp-" + rcpInfofromEl.id + "\"> " +
+            "           </div>" +
+            "       </div>" +
             "   </div>" +
             "</div>"
         );

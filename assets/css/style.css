@@ -79,7 +79,9 @@ footer {
     font-size: 16px !important;
 }
 .rcpcard-active {background-color: #26a69a;}
-
+.ingrd-ctner {padding: 0 30px;}
+.mp-outer-ctner {height: 500px;}
+.mp-ctner {height: 100%;}
 /* Makes contact form input fields white (easier to read) */
 .input-field label {
 color: white;
