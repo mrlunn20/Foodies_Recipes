@@ -20,8 +20,14 @@ h3 {
     font-family: cursive;
 }
 
+h2 {
+    font-size: small;
+    color:white;
+    margin-top: 25px;
+}
+
 p {
-    color: white;
+    color: black;
     font-size: 20px;
 }
 
