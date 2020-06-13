@@ -24,6 +24,28 @@ $(document).ready(function(){
     -------------------------------------------*/
     //User actions
     // Event listenter for Click in text area for "Search Recipes"
+    $(".sch-form").on("submit", function(event){
+        event.preventDefault();
+        let strRcpEndPoint;
+        if(isTextBoxEmpty($("#search-input").val())){
+            //text box empty
+           strRcpEndPoint = fnRcpEndPointAssembly();
+           schRandomFlag = true;
+        }
+        else{
+            //search by ingredient -- i.e apples,flour,sugar ---   apples,flour ,Sugar  
+            strRcpEndPoint = fnRcpEndPointAssembly($("#search-input").val());
+            schRandomFlag = false;
+        }
+        //call function to query rcp API
+        fnQueryRcpAPI(strRcpEndPoint, schRandomFlag);
+
+        //display section with results
+        fnClassHiddenRemove();
+
+        //scroll to element
+        fnScrollToElement("rcp-result-section");
+    });
 
     $("#rcpsearch-btn").on("click", function(event){
         event.preventDefault();
