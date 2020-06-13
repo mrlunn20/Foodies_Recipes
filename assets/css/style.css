@@ -55,6 +55,17 @@ footer {
     background-color: black;
 }
 
+.sch-form {width: 100%;}
+.sch-form input {border-bottom: none !important; background-color: black !important; opacity: 50%; height: 60px !important; color:white; text-align: center; font-size: 20px !important;}
+.sch-form input:focus, .sch-form input:active {background-color: white !important; color: black !important;}
+.sch-ctner {height: 250px;}
+.cnt-padding {padding: 200px 0;}
+.pnl-border {border: 1px solid gray; border-radius: 5px;}
+.ic-save-rcp, .ic-title-rcp {display: inline-flex; vertical-align: top;}
+.ic-save-rcp {font-size: 22px;}
+.ic-title-rcp {font-size: 40px; margin: 0 15px 0 0;}
+.card-content:hover {cursor: pointer;}
+.rcpImg{ width: 100%}
 
 /* Makes contact form input fields white (easier to read) */
 h2, .input-field label {

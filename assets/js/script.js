@@ -1,5 +1,9 @@
 $(document).ready(function(){
 
+    //TODO: remove example below for release.
+    $('.collapsible').collapsible();
+
+
     //temporary variables only for development
     //TODO: delete the two variables below when releasing the project
     let srchRandomEP = "https://arielcc88.github.io/UT-FSWD-DEPLOYED/assets/srch_random.json";
@@ -18,12 +22,13 @@ $(document).ready(function(){
     let infoPane;
     let usrGeoFlag = false; //indicates state of geolocation permissions by user. 
 
+    let schRandomFlag = false;
+    let gblRcpObj;
      /*-------------------------------------------
                     MAIN
     -------------------------------------------*/
     //User actions
-
-// Event listenter for Click in text area for "Search Recipes"
+    // Event listenter for Click in text area for "Search Recipes"
 
     $("#rcpsearch-btn").on("click", function(event){
         // event.preventDefault();
@@ -31,17 +36,21 @@ $(document).ready(function(){
         if(isTextBoxEmpty($("#search-input").val())){
             //text box empty
            strRcpEndPoint = fnRcpEndPointAssembly();
+           schRandomFlag = true;
         }
         else{
             //search by ingredient -- i.e apples,flour,sugar ---   apples,flour ,Sugar  
             strRcpEndPoint = fnRcpEndPointAssembly($("#search-input").val());
+            schRandomFlag = false;
         }
-        console.log("endpoint: ", strRcpEndPoint);
         //call function to query rcp API
-        fnQueryRcpAPI(strRcpEndPoint);
+        fnQueryRcpAPI(strRcpEndPoint, schRandomFlag);
     });
 
-
+    $(document).on("click", ".card-content", (event) => {
+        event.stopPropagation();
+        fnCreatePanelCollabInfo(event.currentTarget.getAttribute("data-eindex"));
+    });
 
     /*-------------------------------------------
                     FUNCTIONS
@@ -78,7 +87,7 @@ $(document).ready(function(){
         return endPointURL
     }
 
-    // function fnStrSplitByComma(strList){
+    // function fnStrSplitByComma(strList, isRandomSch){
     //     //verifying string not empty
     //     if (strList) {
     //         return strList.split(",");
@@ -108,7 +117,7 @@ $(document).ready(function(){
 
     //Temp function for development only
     //TODO: Delete function below when releasing project. Only used for development stage
-    function fnQueryRcpAPI(strEndPoint){
+    function fnQueryRcpAPI(strEndPoint, isRandomSch){
         //apiSettings get passed into ajax call
         let apiSettings = {
             "async": true,
@@ -117,10 +126,222 @@ $(document).ready(function(){
         }
 
         //querying endpoint at rapid API
-        $.ajax(apiSettings).then(function (response) {
-            console.log(response);
-            //TODO: call next step function to extract recipe names and query google's API
+        $.ajax(apiSettings).then(function(response) {
+            if (isRandomSch) {
+                //call DOMAssembly function and pass reponse obj
+                fnRcpListDOMAssembly(response, isRandomSch);
+            } else {
+                //search by ingred extension
+                //TODO: uncomment line below for release
+                //fnExtendSchByIngredients(response);
+                //TODO: remove line below for release
+                fnRcpListDOMAssembly(response);
+            }
+            console.log("fnQueryRcpAPI ajax end here");
         });
+    }
+
+    function fnExtendSchByIngredients(rcpObjArr){
+        let rcpInfoObj = {};
+        let rcpIDString = "";
+        let apiBulkQueryURL = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk?ids=";
+        //api settings here
+        let apiBulkSettings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "",
+            "method": "GET",
+            "headers": {
+                "x-rapidapi-host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+                "x-rapidapi-key": "f2143b91dcmsh2ab34738e9c4db3p18fd8ajsne4052a78d8a5"
+            }
+        };
+        //----
+        //extract the recipe ids for bulk query
+        rcpObjArr.forEach((element,index) => {
+            rcpIDString += element.id
+            if (!(index === rcpObjArr.length - 1)) {
+                rcpIDString += ",";
+            }
+        });
+        //updating apiBulkSettings with url
+        apiBulkSettings["url"] = apiBulkQueryURL + rcpIDString;
+        //TODO: delete below line for releasing
+        ////apiBulkSettings["url"] = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk?ids=65597";
+
+        //second ajax call to rcp API to extract additional information
+        $.ajax(apiBulkSettings).then(function(responseBulk){
+            if (responseBulk) {
+                //ensuring no empty array is pushed to previous object
+                rcpInfoObj["recipes"] = responseBulk;
+                //pushing bulk object into schByIng object
+                rcpObjArr.push(rcpInfoObj);
+                //console.log("search by Ing updated ", rcpObjArr);
+
+                //call DOM Assembly function below
+                fnRcpListDOMAssembly(rcpObjArr, false);
+            }
+        });
+    }
+
+
+
+    function fnRcpListDOMAssembly(rcpData, randomSDOM){
+        //recipe result list creation
+        //initiate -> remove nay previous result
+        $("#rcp-list-ul").empty();
+        //extract obj with recipe information
+        let objRecipes;
+        if (randomSDOM) {
+            objRecipes = rcpData.recipes;
+            console.log("random");
+        }
+        else {
+            objRecipes = rcpData[rcpData.length - 1].recipes;
+            console.log("ingredients");
+        }
+        console.log(objRecipes);
+        gblRcpObj = objRecipes;
+        objRecipes.forEach((element,index) => {
+            fnCreateRcpCardElement(element, index);
+        });
+        fnCreatePanelCollabInfo(0);
+    }
+
+    function fnCreateRcpCardElement(rcpInfo, elNumInd){
+        let ilCard = $("<li>");
+        ilCard.attr({"class": "rcp_title_card"});
+        //card content
+        let cardDiv = $("<div>");
+        cardDiv.attr({"class": "card horizontal hoverable"});
+        //card stacked div
+        let cardstDiv = $("<div>");
+        cardstDiv.attr({"class": "card-stacked"});
+        //card content div
+        let cardCntDiv = $("<div>");
+        cardCntDiv.attr({
+            "class": "card-content",
+            "data-eIndex": elNumInd
+        });
+        //title
+        let titleSpan = $("<span>");
+        titleSpan.attr({"class": "card-title grey-text text-darken-4"});
+        titleSpan.text(rcpInfo.title);
+        //icon
+        let titleIcon = $("<i>");
+        titleIcon.attr({"class": "material-icons ic-title-rcp"});
+        titleIcon.text("restaurant_menu");
+        //action section in card
+        let cardAction = $("<div>");
+        cardAction.attr({"class": "card-action"});
+        //save recipe link
+        let svRcpLink = $("<a>");
+        svRcpLink.text("Save Recipe");
+        //plus sing icon for svRcpLink
+        let svRcpIcon = $("<i>");
+        svRcpIcon.attr({"class": "material-icons ic-save-rcp"});
+        svRcpIcon.text("add");
+
+        //adding icon to span
+        titleSpan.prepend(titleIcon);
+        // appending span to card content
+        cardCntDiv.append(titleSpan);
+        //appending card content to card-stacked
+        cardstDiv.append(cardCntDiv);
+
+         //prepend icon to a tag
+         svRcpLink.prepend(svRcpIcon);
+         //adding link to card action div
+         cardAction.append(svRcpLink);
+        //appending card action to card-stacked
+        cardstDiv.append(cardAction);
+
+        //append card stacked to card horizontal
+        cardDiv.append(cardstDiv);
+
+        //card to il element
+        ilCard.append(cardDiv);
+
+        //append ilCard to ul element
+        $("#rcp-list-ul").append(ilCard);
+    }
+
+    function fnCreatePanelCollabInfo(rcpIndex){
+        let rcpInfofromEl = gblRcpObj[rcpIndex];
+        let vegetarian = rcpInfofromEl.vegetarian ? "Yes" : "No";
+        let vegan = rcpInfofromEl.vegan ? "Yes" : "No";
+        let dairy = rcpInfofromEl.dairyFree ? "Yes" : "No";
+        let gluten = rcpInfofromEl.glutenFree ? "Yes" : "No";
+        let servings = rcpInfofromEl.servings ? rcpInfofromEl.servings : "";
+        let prepTime = rcpInfofromEl.preparationMinutes ? rcpInfofromEl.preparationMinutes : "";
+        let cookTime = rcpInfofromEl.cookingMinutes ? rcpInfofromEl.cookingMinutes : "";
+
+        //getting ingredients
+        let extendedIngrd = rcpInfofromEl.extendedIngredients;
+        let strIngredientsHTML = "";
+
+        extendedIngrd.forEach((ingrdInfo, ingIndex) => {
+            strIngredientsHTML += "<li>" + ingrdInfo.originalString + "</li>";
+        });
+
+        //collapsible ul
+        // let ulCollapsible = $("<ul>");
+        // ulCollapsible.attr({"class": "collapsible"});
+        $(".collapsible").empty();
+        let liCollapsibleRcp = $("<li>");
+        let liCollapsibleMaps = $("<li>");
+        
+        liCollapsibleRcp.html(
+            "<div class=\"collapsible-header\"> " + 
+            "   <i class=\"material-icons\">restaurant_menu</i>" + rcpInfofromEl.title +
+            "</div>" +
+            "<div class=\"collapsible-body\">" +
+            "   <span>Lorem ipsum dolor sit amet.</span>" +
+            "   <div class=\"row\">" +
+            "       <div class=\"col s12 m4 l4\">" +
+            "           <div class=\"rcpImgCtner\">" +
+            "               <img src=\"" + rcpInfofromEl.image + "\" alt=\"" + rcpInfofromEl.title + "\" class=\"rcpImg\">" +
+            "           </div>" + 
+            "           <ul class=\"rcpFactList\">" + 
+            "               <li>Vegetarian: " + vegetarian + "</li>" + 
+            "               <li>Vegan: " + vegan + "</li>" + 
+            "               <li>Gluten Free: " + gluten + "</li>" + 
+            "               <li>Dairy Free: " + dairy + "</li>" + 
+            "               <li>Servings: " + servings + "</li>" + 
+            "               <li>Prep. Time(min): " + prepTime + "</li>" + 
+            "               <li>Cook. Time(min): " + cookTime + "</li>" + 
+            "           </ul>" +
+            "       </div>" + 
+            "       <div class=\"col s12 m8 l8\">" +
+            "           <h5>Ingredients</h5>" + 
+            "           <ul class=\"rcpFactList\">" + strIngredientsHTML + "</ul>" +
+            "       </div>" +
+            "       <div class=\"col s12\">" + 
+            "           <h5>Summary</h5>" +
+            "           <p>" + rcpInfofromEl.summary + "</p>" +
+            "       </div>"+
+            "       <div class=\"col s12\">" + 
+            "           <h5>Instructions</h5>" +
+            "           <p>" + rcpInfofromEl.instructions + "</p>" +
+            "       </div>"+                    
+            "   </div>" +
+            "</div>"
+        );
+        $(".collapsible").append(liCollapsibleRcp);
+
+        /** Maps */
+        liCollapsibleMaps.html(
+            "<div class=\"collapsible-header mp-load\" data-mapctner=\"mp-" + rcpInfofromEl.id + "\" data-rcpname=\"" + rcpInfofromEl.title +"\"> " + 
+            "   <i class=\"material-icons\">place</i>Show Nearby Restaurants" +
+            "</div>" +
+            "<div class=\"collapsible-body\">" +
+            "<p class=\"mp-notifier\"></p>" +
+            "   <div class=\"mp-ctner\" id=\"mp-" + rcpInfofromEl.id + "\"> " +
+
+            "   </div>" +
+            "</div>"
+        );
+        $(".collapsible").append(liCollapsibleMaps);
     }
 
 
