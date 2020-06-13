@@ -1,7 +1,5 @@
 $(document).ready(function(){
     $('.collapsible').collapsible();
-
-
     //temporary variables only for development
     //TODO: delete the two variables below when releasing the project
     let srchRandomEP = "https://arielcc88.github.io/UT-FSWD-DEPLOYED/assets/srch_random.json";
@@ -19,7 +17,6 @@ $(document).ready(function(){
     let service;
     let infoPane;
     let usrGeoFlag = false; //indicates state of geolocation permissions by user. 
-
     let schRandomFlag = false;
     let gblRcpObj;
      /*-------------------------------------------
@@ -117,15 +114,8 @@ $(document).ready(function(){
         return endPointURL
     }
 
-    // function fnStrSplitByComma(strList, isRandomSch){
-    //     //verifying string not empty
-    //     if (strList) {
-    //         return strList.split(",");
-    //     }
-    // }
-
     //TODO: Un-comment function below when releasing project.
-    // function fnQueryRcpAPI(strEndPoint){
+    // function fnQueryRcpAPI(strEndPoint, isRandomSch){
     //     //apiSettings get passed into ajax call
     //     let apiSettings = {
     //         "async": true,
@@ -140,8 +130,13 @@ $(document).ready(function(){
 
     //     //querying endpoint at rapid API
     //     $.ajax(apiSettings).then(function (response) {
-    //         console.log(response);
-    //         //TODO: call next step function to extract recipe names and query google's API
+        // if (isRandomSch) {
+        //     //call DOMAssembly function and pass reponse obj
+        //     fnRcpListDOMAssembly(response, isRandomSch);
+        // } else {
+        //     //search by ingred extension
+        //     fnExtendSchByIngredients(response);
+        // }
     //     });
     // }
 
@@ -162,12 +157,9 @@ $(document).ready(function(){
                 fnRcpListDOMAssembly(response, isRandomSch);
             } else {
                 //search by ingred extension
-                //TODO: uncomment line below for release
-                //fnExtendSchByIngredients(response);
-                //TODO: remove line below for release
                 fnRcpListDOMAssembly(response);
             }
-            console.log("fnQueryRcpAPI ajax end here");
+            // console.log("fnQueryRcpAPI ajax end here");
         });
     }
 
@@ -196,8 +188,6 @@ $(document).ready(function(){
         });
         //updating apiBulkSettings with url
         apiBulkSettings["url"] = apiBulkQueryURL + rcpIDString;
-        //TODO: delete below line for releasing
-        ////apiBulkSettings["url"] = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk?ids=65597";
 
         //second ajax call to rcp API to extract additional information
         $.ajax(apiBulkSettings).then(function(responseBulk){
@@ -224,13 +214,13 @@ $(document).ready(function(){
         let objRecipes;
         if (randomSDOM) {
             objRecipes = rcpData.recipes;
-            console.log("random");
+            // console.log("random");
         }
         else {
             objRecipes = rcpData[rcpData.length - 1].recipes;
-            console.log("ingredients");
+            // console.log("ingredients");
         }
-        console.log(objRecipes);
+        // console.log(objRecipes);
         gblRcpObj = objRecipes;
         objRecipes.forEach((element,index) => {
             fnCreateRcpCardElement(element, index);
@@ -371,7 +361,6 @@ $(document).ready(function(){
             "<p class=\"mp-notifier\"></p>" +
             "   <div class=\"row\">" +
             "       <div class=\"col s12 m12 l12 mp-outer-ctner\">" +
-            "" +
             "           <div class=\"mp-ctner\" id=\"mp-" + rcpInfofromEl.id + "\"> " +
             "           </div>" +
             "       </div>" +
@@ -379,6 +368,8 @@ $(document).ready(function(){
             "</div>"
         );
         $(".collapsible").append(liCollapsibleMaps);
+
+        infoPane = document.getElementById('panel');
     }
 
 
@@ -395,8 +386,8 @@ $(document).ready(function(){
                     lng: position.coords.longitude
                 };
                 usrGeoFlag = true; 
-                console.log("geo approved ", usrGeoFlag);
-                console.log("usr coords ", pos);
+                // console.log("geo approved ", usrGeoFlag);
+                // console.log("usr coords ", pos);
                 fnMapsRender(usrGeoFlag, true, mapCtnerId, rcpName);
             }, () => {
                 // Browser supports geolocation, but user has denied permission
@@ -513,5 +504,22 @@ $(document).ready(function(){
         * show all the markers within the visible area. */
         map.fitBounds(bounds);
     }
+
+    // Builds an InfoWindow to display details above the marker
+    function showDetails(placeResult, marker, status) {
+        if (status == google.maps.places.PlacesServiceStatus.OK) {
+          let placeInfowindow = new google.maps.InfoWindow();
+          let rating = "None";
+          if (placeResult.rating) rating = placeResult.rating;
+          placeInfowindow.setContent('<div><strong>' + placeResult.name +
+            '</strong><br>' + 'Rating: ' + rating + '<br>' + placeResult.formatted_address +
+            '</div>');
+          placeInfowindow.open(marker.map, marker);
+          currentInfoWindow.close();
+          currentInfoWindow = placeInfowindow;
+        } else {
+          console.log('showDetails failed: ' + status);
+        }
+      }
 })
 
